@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Compute maintainer payouts and push a payout item onto maintainer payouts ledger
+Parameters:
+  MongoUri:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: '/api/db/mongo_uri'
+Resources:
+  ComputeMaintainerPayoutsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 240
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: ./
+      Events:
+        StartScheduleEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 22 * * *)
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Statement:
+          - Effect: Allow
+            Action:
+              - 'kms:Decrypt'
+              - 'kms:ListKeys'
+            Resource: '*'
+      Environment:
+        Variables:
+          MONGO_URI: !Ref MongoUri
