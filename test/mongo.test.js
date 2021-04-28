@@ -82,6 +82,8 @@ test.before(async (t) => {
     ]
   })
   t.context.pkgId3 = pkgId3
+
+  sinon.stub(Date, 'now').returns(123456)
 })
 
 test.after(async (t) => {
@@ -122,7 +124,13 @@ test('appendPayoutsToMaintainers', async (t) => {
   await t.context.Mongo.appendPayoutsToMaintainers({ maintainerPayouts })
 
   const updatedUser1 = await t.context.Mongo.db.collection('users').findOne({ _id: t.context.userId1 })
-  t.deepEqual(updatedUser1.payouts[0], maintainerPayouts.get(t.context.userId1.toString()))
+  t.deepEqual(updatedUser1.payouts[0], {
+    ...maintainerPayouts.get(t.context.userId1.toString()),
+    timestamp: 123456
+  })
   const updatedUser2 = await t.context.Mongo.db.collection('users').findOne({ _id: t.context.userId2 })
-  t.deepEqual(updatedUser2.payouts[0], maintainerPayouts.get(t.context.userId2.toString()))
+  t.deepEqual(updatedUser2.payouts[0], {
+    ...maintainerPayouts.get(t.context.userId2.toString()),
+    timestamp: 123456
+  })
 })
