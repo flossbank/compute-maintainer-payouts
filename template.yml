@@ -9,7 +9,7 @@ Resources:
   ComputeMaintainerPayoutsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Timeout: 240
+      Timeout: 900
       Handler: index.handler
       Runtime: nodejs12.x
       CodeUri: ./
