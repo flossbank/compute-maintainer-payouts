@@ -17,10 +17,10 @@ Resources:
         CMPSchedule:
           Type: Schedule
           Properties:
-            Description: Every week
+            Description: Every 22 hrs
             Name: ComputeMaintainerPayoutsSchedule
             Enabled: true
-            Schedule: rate(7 days)
+            Schedule: rate(22 hours)
       Policies:
         - Statement:
           - Effect: Allow
