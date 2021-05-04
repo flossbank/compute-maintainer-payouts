@@ -144,4 +144,7 @@ test('should compute and update maintainers successfully', async (t) => {
 
   const updatePkg3 = await t.context.Mongo.db.collection('packages').findOne({ _id: t.context.pkgId3 })
   t.true(updatePkg3.adRevenue.every((a) => a.processed === true))
+
+  const updatePkg4 = await t.context.Mongo.db.collection('packages').findOne({ _id: t.context.pkgId4 })
+  t.true(updatePkg4.donationRevenue.every((a) => a.processed === true))
 })
