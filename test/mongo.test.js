@@ -106,7 +106,7 @@ test('updatePackagesIncomeToProcessed', async (t) => {
   t.true(updatePkg2.donationRevenue.every((a) => a.processed === true))
 })
 
-test('appendPayoutsToMaintainers', async (t) => {
+test('appendPayoutsToMaintainers | have payouts', async (t) => {
   const maintainerPayouts = new Map()
   maintainerPayouts.set(t.context.userId1.toString(), {
     id: 'dddddddddddd',
@@ -133,6 +133,19 @@ test('appendPayoutsToMaintainers', async (t) => {
     ...maintainerPayouts.get(t.context.userId2.toString()),
     timestamp: 123456
   })
+})
+
+test('appendPayoutsToMaintainers | no payouts', async (t) => {
+  const mongo = new Mongo({})
+  mongo.db = {
+    collection: () => ({
+      initializeUnorderedBulkOp: sinon.stub()
+    })
+  }
+  const maintainerPayouts = new Map()
+  await mongo.appendPayoutsToMaintainers({ maintainerPayouts })
+
+  t.true(mongo.db.collection().initializeUnorderedBulkOp.notCalled)
 })
 
 test('close', async (t) => {
