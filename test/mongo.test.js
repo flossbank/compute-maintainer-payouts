@@ -134,3 +134,11 @@ test('appendPayoutsToMaintainers', async (t) => {
     timestamp: 123456
   })
 })
+
+test('close', async (t) => {
+  const mongo = new Mongo({})
+  await mongo.close() // nothing to close here
+  mongo.mongoClient = { close: sinon.stub() }
+  await mongo.close()
+  t.true(mongo.mongoClient.close.calledOnce)
+})
