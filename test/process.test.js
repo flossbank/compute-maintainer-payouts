@@ -42,18 +42,23 @@ test.before(async (t) => {
     ],
     adRevenue: [
       {
-        id: ulid().substring(0, 12),
+        id: ulid(),
         amount: 100
       }
     ],
     donationRevenue: [
       {
-        id: ulid().substring(0, 12),
+        id: ulid(),
         amount: 200
       },
       {
-        id: ulid().substring(0, 12),
+        id: ulid(),
         amount: 300
+      },
+      {
+        id: ulid(),
+        amount: 1000,
+        processed: true
       }
     ]
   })
@@ -63,13 +68,13 @@ test.before(async (t) => {
     name: 'greece',
     adRevenue: [
       {
-        id: ulid().substring(0, 12),
+        id: ulid(),
         amount: 150
       }
     ],
     donationRevenue: [
       {
-        id: ulid().substring(0, 12),
+        id: ulid(),
         amount: 200
       }
     ]
@@ -84,17 +89,32 @@ test.before(async (t) => {
     }],
     adRevenue: [
       {
-        id: ulid().substring(0, 12),
+        id: ulid(),
         amount: 150
       },
       {
-        id: ulid().substring(0, 12),
+        id: ulid(),
         amount: 150,
         processed: true
       }
     ]
   })
   t.context.pkgId3 = pkgId3
+
+  const { insertedId: pkgId4 } = await t.context.Mongo.db.collection('packages').insertOne({
+    name: 'brazil',
+    maintainers: [{
+      revenuePercent: 0,
+      userId: userId2.toString()
+    }],
+    donationRevenue: [
+      {
+        id: ulid(),
+        amount: 1000
+      }
+    ]
+  })
+  t.context.pkgId4 = pkgId4
 })
 
 test.after(async (t) => {
@@ -110,6 +130,7 @@ test('should compute and update maintainers successfully', async (t) => {
 
   const updatedUser2 = await t.context.Mongo.db.collection('users').findOne({ _id: t.context.userId2 })
   // User 2 should have half revenue from package 1 and all revenue available of package 3
+  // they don't get any of the 1000 in package 4 (brazil) since their rev share is 0%
   t.deepEqual(updatedUser2.payouts[0].amount, 450)
 
   const updatePkg1 = await t.context.Mongo.db.collection('packages').findOne({ _id: t.context.pkgId1 })
@@ -123,4 +144,7 @@ test('should compute and update maintainers successfully', async (t) => {
 
   const updatePkg3 = await t.context.Mongo.db.collection('packages').findOne({ _id: t.context.pkgId3 })
   t.true(updatePkg3.adRevenue.every((a) => a.processed === true))
+
+  const updatePkg4 = await t.context.Mongo.db.collection('packages').findOne({ _id: t.context.pkgId4 })
+  t.true(updatePkg4.donationRevenue.every((a) => a.processed === true))
 })
