@@ -82,6 +82,8 @@ test.before(async (t) => {
     ]
   })
   t.context.pkgId3 = pkgId3
+
+  sinon.stub(Date, 'now').returns(123456)
 })
 
 test.after(async (t) => {
@@ -104,7 +106,7 @@ test('updatePackagesIncomeToProcessed', async (t) => {
   t.true(updatePkg2.donationRevenue.every((a) => a.processed === true))
 })
 
-test('appendPayoutsToMaintainers', async (t) => {
+test('appendPayoutsToMaintainers | have payouts', async (t) => {
   const maintainerPayouts = new Map()
   maintainerPayouts.set(t.context.userId1.toString(), {
     id: 'dddddddddddd',
@@ -122,7 +124,34 @@ test('appendPayoutsToMaintainers', async (t) => {
   await t.context.Mongo.appendPayoutsToMaintainers({ maintainerPayouts })
 
   const updatedUser1 = await t.context.Mongo.db.collection('users').findOne({ _id: t.context.userId1 })
-  t.deepEqual(updatedUser1.payouts[0], maintainerPayouts.get(t.context.userId1.toString()))
+  t.deepEqual(updatedUser1.payouts[0], {
+    ...maintainerPayouts.get(t.context.userId1.toString()),
+    timestamp: 123456
+  })
   const updatedUser2 = await t.context.Mongo.db.collection('users').findOne({ _id: t.context.userId2 })
-  t.deepEqual(updatedUser2.payouts[0], maintainerPayouts.get(t.context.userId2.toString()))
+  t.deepEqual(updatedUser2.payouts[0], {
+    ...maintainerPayouts.get(t.context.userId2.toString()),
+    timestamp: 123456
+  })
+})
+
+test('appendPayoutsToMaintainers | no payouts', async (t) => {
+  const mongo = new Mongo({})
+  mongo.db = {
+    collection: () => ({
+      initializeUnorderedBulkOp: sinon.stub()
+    })
+  }
+  const maintainerPayouts = new Map()
+  await mongo.appendPayoutsToMaintainers({ maintainerPayouts })
+
+  t.true(mongo.db.collection().initializeUnorderedBulkOp.notCalled)
+})
+
+test('close', async (t) => {
+  const mongo = new Mongo({})
+  await mongo.close() // nothing to close here
+  mongo.mongoClient = { close: sinon.stub() }
+  await mongo.close()
+  t.true(mongo.mongoClient.close.calledOnce)
 })

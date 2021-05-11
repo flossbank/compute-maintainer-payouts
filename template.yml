@@ -9,17 +9,19 @@ Resources:
   ComputeMaintainerPayoutsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Timeout: 900
+      Timeout: 840
       Handler: index.handler
       Runtime: nodejs12.x
       CodeUri: ./
       Events:
-        StartScheduleEvent:
+        CMPSchedule:
           Type: Schedule
           Properties:
-            Schedule: cron(0 22 * * *)
+            Description: Every 22 hrs
+            Name: ComputeMaintainerPayoutsSchedule
+            Enabled: true
+            Schedule: rate(22 hours)
       Policies:
-        - AmazonDynamoDBFullAccess
         - Statement:
           - Effect: Allow
             Action:
