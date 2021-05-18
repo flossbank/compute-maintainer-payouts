@@ -28,6 +28,7 @@ test.before(async (t) => {
 
   const { insertedId: pkgId1 } = await t.context.Mongo.db.collection('packages').insertOne({
     name: 'lithuania',
+    hasMaintainers: true,
     maintainers: [{
       revenuePercent: 100,
       userId: userId1.toString()
@@ -51,6 +52,7 @@ test.before(async (t) => {
   })
   t.context.pkgId1 = pkgId1
 
+  // no maintainers on pkg2
   const { insertedId: pkgId2 } = await t.context.Mongo.db.collection('packages').insertOne({
     name: 'greece',
     adRevenue: [
@@ -70,6 +72,7 @@ test.before(async (t) => {
 
   const { insertedId: pkgId3 } = await t.context.Mongo.db.collection('packages').insertOne({
     name: 'argentina',
+    hasMaintainers: true,
     maintainers: [{
       revenuePercent: 100,
       userId: userId1.toString()
