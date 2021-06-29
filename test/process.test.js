@@ -44,6 +44,11 @@ test.before(async (t) => {
     adRevenue: [
       {
         id: ulid(),
+        amount: 100,
+        processed: true
+      },
+      {
+        id: ulid(),
         amount: 100
       }
     ],

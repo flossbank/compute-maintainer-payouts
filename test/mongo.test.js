@@ -35,11 +35,21 @@ test.before(async (t) => {
     }],
     adRevenue: [
       {
+        id: 'ddddddddddda',
+        amount: 150,
+        processed: true
+      },
+      {
         id: 'dddddddddddd',
         amount: 150
       }
     ],
     donationRevenue: [
+      {
+        id: 'cccccccccccd',
+        amount: 300,
+        processed: true
+      },
       {
         id: 'bbbbbbbbbbbb',
         amount: 200
