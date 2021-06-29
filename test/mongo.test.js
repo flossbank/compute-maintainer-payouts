@@ -86,6 +86,16 @@ test.before(async (t) => {
   })
   t.context.pkgId3 = pkgId3
 
+  const { insertedId: pkgId4 } = await t.context.Mongo.db.collection('packages').insertOne({
+    name: 'argentina4',
+    hasMaintainers: true,
+    maintainers: [{
+      revenuePercent: 100,
+      userId: userId1.toString()
+    }]
+  })
+  t.context.pkgId4 = pkgId4
+
   sinon.stub(Date, 'now').returns(123456)
 })
 
